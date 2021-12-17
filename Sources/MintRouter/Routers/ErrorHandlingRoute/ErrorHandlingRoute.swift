@@ -15,7 +15,7 @@ public protocol ErrorHandlingRoute {
     func show(title: String, error: Error)
 }
 
-public extension ErrorHandlingRoute where Self: RouterProtocol {
+public extension ErrorHandlingRoute where Self: BaseCoordinatorRoutable {
     func show(title: String, error: Error) {
         if let handler = self.controller as? ErrorHandling {
             if handler.handle(error: error) {
