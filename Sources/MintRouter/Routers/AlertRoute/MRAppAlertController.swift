@@ -181,7 +181,7 @@ private struct DefaultSheetAlertViewFactory: AlertViewFactory {
                 tapBlock?(offset)
             }))
         }
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: { _ in
+        alert.addAction(UIAlertAction(title: title, style: .cancel, handler: { _ in
             tapBlock?(buttons.count + 1)
         }))
         return alert
