@@ -14,6 +14,6 @@ public protocol ShareRoute {
 public extension ShareRoute where Self: BaseCoordinatorRoutable {
     func openShare(url: URL) {
         let module = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-        ModalRouter(target: module, parent: self.controller).move()
+        PresentRouter(target: module, parent: self.controller).move()
     }
 }
