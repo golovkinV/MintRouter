@@ -12,7 +12,7 @@ public class ModalRouter: NSObject, ChaperoneRouter {
     let target: UIViewController
     let parent: UIViewController?
     
-    public var windowLevel: UIWindow.Level = .normal
+    var windowLevel: UIWindow.Level = .normal
     
     public init(target: UIViewController, parent: UIViewController?) {
         self.target = target

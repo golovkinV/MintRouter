@@ -9,15 +9,15 @@ import Foundation
 import FittedSheets
 import UIKit
 
-public class BottomSheetRouter: NSObject, ChaperoneRouter {
+public final class BottomSheetRouter: NSObject, ChaperoneRouter {
         
     let target: UIViewController
     let parent: UIViewController?
-    var windowLevel: UIWindow.Level = .normal
     let sheetSizes: [SheetSize]
     let options: SheetOptions
+    var windowLevel: UIWindow.Level = .normal
     
-    init(target: UIViewController,
+    public init(target: UIViewController,
          parent: UIViewController?,
          sheetSizes: [SheetSize] = [.fullscreen],
          options: SheetOptions = .init(
