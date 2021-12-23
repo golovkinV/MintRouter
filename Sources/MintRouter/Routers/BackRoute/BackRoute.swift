@@ -5,13 +5,13 @@
 //  Created by Nikita Abramenko on 28.07.2021.
 //
 
-public protocol BackRoute {
+public protocol BackRoute where Self: BaseCoordinatorRoutable {
     func back()
     func backToRoot()
     func backToRoot(animation: Bool)
 }
 
-public extension BackRoute where Self: BaseCoordinatorRoutable {
+public extension BackRoute {
     func back() {
         if let nc = self.controller.navigationController, nc.viewControllers.first != self.controller {
             nc.popViewController(animated: true)

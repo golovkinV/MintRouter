@@ -7,11 +7,11 @@
 
 import UIKit
 
-public protocol ShareRoute {
+public protocol ShareRoute where Self: BaseCoordinatorRoutable {
     func openShare(url: URL)
 }
 
-public extension ShareRoute where Self: BaseCoordinatorRoutable {
+public extension ShareRoute {
     func openShare(url: URL) {
         let module = UIActivityViewController(activityItems: [url], applicationActivities: nil)
         ModalRouter(target: module, parent: self.controller).move()
