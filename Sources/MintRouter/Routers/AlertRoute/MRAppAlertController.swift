@@ -24,17 +24,35 @@ public class MRAppAlertController {
     public static func set(alertPresent: AlertPresentProtocol) -> MRAppAlertController.Type {
         return self
     }
+    
+    public static func alertPublisher(_ title: String?,
+                                      message: String? = "") -> UIAlertController {
+        return self.alertFactory.create(title,
+                                        message: message,
+                                        buttons: [],
+                                        cancelTitle: nil,
+                                        tapBlock: nil)
+    }
+    
+    public static func sheetAlertPublisher(_ title: String? = nil,
+                                           message: String? = nil,
+                                           cancelTitle: String? = "") -> UIAlertController {
+        return self.sheetAlertFactory.create(title,
+                                             message: message,
+                                             buttons: [],
+                                             cancelTitle: cancelTitle,
+                                             tapBlock: nil)
+    }
 
     public static func alert(_ title: String,
                              message: String = "",
                              acceptMessage: String = "OK",
-                             userData: Any? = nil,
                              acceptBlock: (() -> Void)? = nil) {
         let buttons = [AlertButton(acceptMessage, .default)]
         let alert = self.alertFactory.create(title,
                                              message: message,
                                              buttons: buttons,
-                                             userData: userData) { _ in
+                                             cancelTitle: nil) { _ in
             acceptBlock?()
         }
         viewController.present(alert, animated: true, completion: nil)
@@ -43,13 +61,13 @@ public class MRAppAlertController {
     public static func alertSheet(_ title: String,
                                   message: String,
                                   buttons: [String],
-                                  userData: Any? = nil,
+                                  cancelTitle: String? = nil,
                                   tapBlock: ((Int) -> Void)? = nil) {
         let alertButtons = buttons.map { AlertButton($0, .default) }
         let alert = self.sheetAlertFactory.create(title,
                                                   message: message,
                                                   buttons: alertButtons,
-                                                  userData: userData) {
+                                                  cancelTitle: cancelTitle) {
                                                     tapBlock?($0)
         }
         viewController.present(alert, animated: true, completion: nil)
@@ -58,13 +76,13 @@ public class MRAppAlertController {
     public static func alertSheet(_ title: String,
                                   message: String,
                                   buttons: [AlertButton],
-                                  userData: Any? = nil,
+                                  cancelTitle: String? = nil,
                                   tapBlock: ((Int) -> Void)? = nil) {
         
         let alert = self.sheetAlertFactory.create(title,
                                                   message: message,
                                                   buttons: buttons,
-                                                  userData: userData) {
+                                                  cancelTitle: cancelTitle) {
                                                     tapBlock?($0)
         }
         viewController.present(alert, animated: true, completion: nil)
@@ -74,13 +92,12 @@ public class MRAppAlertController {
     public static func alert(_ title: String,
                              message: String,
                              buttons: [String],
-                             userData: Any? = nil,
                              tapBlock: ((Int) -> Void)? = nil) {
         let alertButtons = buttons.map { AlertButton($0, .default) }
         let alert = self.alertFactory.create(title,
                                              message: message,
                                              buttons: alertButtons,
-                                             userData: userData) {
+                                             cancelTitle: nil) {
             tapBlock?($0)
         }
         viewController.present(alert, animated: true, completion: nil)
@@ -89,12 +106,11 @@ public class MRAppAlertController {
     public static func alert(_ title: String,
                              message: String,
                              buttons: [AlertButton],
-                             userData: Any? = nil,
                              tapBlock: ((Int) -> Void)? = nil) {
         let alert = self.alertFactory.create(title,
                                              message: message,
                                              buttons: buttons,
-                                             userData: userData) {
+                                             cancelTitle: nil) {
             tapBlock?($0)
         }
         viewController.present(alert, animated: true, completion: nil)
@@ -146,19 +162,19 @@ public struct DefaultAlertPresent: AlertPresentProtocol {
 // MARK: - Alert Factory
 
 public protocol AlertViewFactory {
-    func create(_ title: String,
-                message: String,
+    func create(_ title: String?,
+                message: String?,
                 buttons: [AlertButton],
-                userData: Any?,
-                tapBlock: ((Int) -> Void)?) -> UIViewController
+                cancelTitle: String?,
+                tapBlock: ((Int) -> Void)?) -> UIAlertController
 }
 
 private struct DefaultAlertViewFactory: AlertViewFactory {
-    public func create(_ title: String,
-                       message: String,
-                       buttons: [AlertButton],
-                       userData: Any?,
-                       tapBlock: ((Int) -> Void)?) -> UIViewController {
+    public func create(_ title: String?,
+                       message: String?,
+                       buttons: [AlertButton] = [],
+                       cancelTitle: String? = nil,
+                       tapBlock: ((Int) -> Void)? = nil) -> UIAlertController {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         for (offset, item) in buttons.enumerated() {
             alert.addAction(UIAlertAction(title: item.text, style: item.style, handler: { _ in
@@ -170,18 +186,20 @@ private struct DefaultAlertViewFactory: AlertViewFactory {
 }
 
 private struct DefaultSheetAlertViewFactory: AlertViewFactory {
-    public func create(_ title: String,
-                       message: String,
-                       buttons: [AlertButton],
-                       userData: Any?,
-                       tapBlock: ((Int) -> Void)?) -> UIViewController {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    public func create(_ title: String?,
+                       message: String?,
+                       buttons: [AlertButton] = [],
+                       cancelTitle: String? = nil,
+                       tapBlock: ((Int) -> Void)? = nil) -> UIAlertController {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
         for (offset, item) in buttons.enumerated() {
             alert.addAction(UIAlertAction(title: item.text, style: item.style, handler: { _ in
                 tapBlock?(offset)
             }))
         }
-        alert.addAction(UIAlertAction(title: title, style: .cancel, handler: { _ in
+        
+        guard let cancelTitle = cancelTitle else { return alert }
+        alert.addAction(UIAlertAction(title: cancelTitle, style: .cancel, handler: { _ in
             tapBlock?(buttons.count + 1)
         }))
         return alert
